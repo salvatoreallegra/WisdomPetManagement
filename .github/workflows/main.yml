@@ -7,38 +7,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Sanity check: fail early if any secret is missing (won't print the values)
-      - name: Validate required Azure secrets exist
-        env:
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: |
-          fail=0
-          [ -z "$AZURE_CLIENT_ID" ] && echo "::error::Missing secret: AZURE_CLIENT_ID" && fail=1
-          [ -z "$AZURE_TENANT_ID" ] && echo "::error::Missing secret: AZURE_TENANT_ID" && fail=1
-          [ -z "$AZURE_SUBSCRIPTION_ID" ] && echo "::error::Missing secret: AZURE_SUBSCRIPTION_ID" && fail=1
-          [ -z "$AZURE_CLIENT_SECRET" ] && echo "::error::Missing secret: AZURE_CLIENT_SECRET" && fail=1
-          exit $fail
-
-      - name: Azure login
+      - name: Azure login (client secret)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Example deploy step (replace with your real deploy)
-      # - name: Deploy Bicep/ARM
-      #   uses: azure/arm-deploy@v2
-      #   with:
-      #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     resourceGroupName: PetClinic
-      #     template: ./main.bicep
+      # your deploy steps here...
