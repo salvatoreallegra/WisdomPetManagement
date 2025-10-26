@@ -30,13 +30,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # IMPORTANT: use repo root (.) as build context so Dockerfile paths like
+      # COPY ["WisdomPetMedicine.Api/WisdomPetMedicine.Api.csproj", "WisdomPetMedicine.Api/"]
+      # actually exist inside the context.
       - name: Build image (Dockerfile in WisdomPetMedicine.Api/)
         run: |
           docker build \
             -f ./WisdomPetMedicine.Api/Dockerfile \
             -t $REGISTRY/$IMAGE_NAME:${TAG} \
             -t $REGISTRY/$IMAGE_NAME:latest \
-            ./WisdomPetMedicine.Api
+            .
 
       - name: Push image
         run: |
