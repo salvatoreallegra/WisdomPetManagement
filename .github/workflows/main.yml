@@ -12,17 +12,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Login to Azure using your service principal JSON in AZURE_CREDENTIALS
+      # Login to Azure using your service principal JSON stored in AZURE_CREDENTIALS
       - name: Azure login (client secret)
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Set variables
-        id: vars
         run: |
           echo "REGISTRY=salspetacr.azurecr.io" >> $GITHUB_ENV
-          echo "IMAGE_NAME=wisdompet" >> $GITHUB_ENV
+          echo "IMAGE_NAME=wisdompetmedicine-api" >> $GITHUB_ENV
           echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
 
       - name: Azure Container Registry login
@@ -31,19 +30,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
+      - name: Build image (Dockerfile in WisdomPetMedicine.Api/)
         run: |
           docker build \
+            -f ./WisdomPetMedicine.Api/Dockerfile \
             -t $REGISTRY/$IMAGE_NAME:${TAG} \
             -t $REGISTRY/$IMAGE_NAME:latest \
-            .
+            ./WisdomPetMedicine.Api
 
       - name: Push image
         run: |
           docker push $REGISTRY/$IMAGE_NAME:${TAG}
           docker push $REGISTRY/$IMAGE_NAME:latest
 
-      - name: Output image reference
+      - name: Output image references
         run: |
           echo "Pushed images:"
           echo " - $REGISTRY/$IMAGE_NAME:${TAG}"
